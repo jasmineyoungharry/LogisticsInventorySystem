@@ -13,4 +13,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Product> Products { get; set; }
 
     public DbSet<Warehouse> Warehouses { get; set; }
+
+    public DbSet<Inventory> Inventories { get; set; }
 }
