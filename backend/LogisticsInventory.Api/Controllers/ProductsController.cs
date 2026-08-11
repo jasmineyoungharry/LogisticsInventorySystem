@@ -2,6 +2,7 @@ using LogisticsInventory.Api.Data;
 using LogisticsInventory.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using LogisticsInventory.Api.DTOs;
 
 namespace LogisticsInventory.Api.Controllers;
 
@@ -17,13 +18,27 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+    public async Task<ActionResult<IEnumerable<ProductResponseDto>>> GetProducts()
     {
-        return await _context.Products.ToListAsync();
+        var products = await _context.Products
+            .Select(product => new ProductResponseDto
+            {
+                Id = product.Id,
+                SKU = product.SKU,
+                Name = product.Name,
+                Description = product.Description,
+                UnitPrice = product.UnitPrice,
+                ReorderLevel = product.ReorderLevel,
+                IsActive = product.IsActive,
+                CreatedAt = product.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(products);
     }
     
     [HttpGet("{id}")]
-    public async Task<ActionResult<Product>> GetProduct(int id)
+    public async Task<ActionResult<ProductResponseDto>> GetProduct(int id)
     {
         var product = await _context.Products.FindAsync(id);
 
@@ -32,43 +47,91 @@ public class ProductsController : ControllerBase
             return NotFound();
         }
 
-        return product;
+        var response = new ProductResponseDto
+        {
+            Id = product.Id,
+            SKU = product.SKU,
+            Name = product.Name,
+            Description = product.Description,
+            UnitPrice = product.UnitPrice,
+            ReorderLevel = product.ReorderLevel,
+            IsActive = product.IsActive,
+            CreatedAt = product.CreatedAt
+        };
+
+        return Ok(response);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Product>> CreateProduct(Product product)
+    public async Task<ActionResult<ProductResponseDto>> CreateProduct(ProductCreateDto dto)
     {
-        _context.Products.Add(product);
+    var product = new Product
+    {
+        SKU = dto.SKU,
+        Name = dto.Name,
+        Description = dto.Description,
+        UnitPrice = dto.UnitPrice,
+        ReorderLevel = dto.ReorderLevel,
+        IsActive = true,
+        CreatedAt = DateTime.UtcNow
+    };
 
-        await _context.SaveChangesAsync();
+    _context.Products.Add(product);
+    await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, product);
+    var response = new ProductResponseDto
+    {
+            Id = product.Id,
+            SKU = product.SKU,
+            Name = product.Name,
+            Description = product.Description,
+            UnitPrice = product.UnitPrice,
+            ReorderLevel = product.ReorderLevel,
+            IsActive = product.IsActive,
+            CreatedAt = product.CreatedAt
+        };
+
+        return CreatedAtAction(
+            nameof(GetProduct),
+            new { id = product.Id },
+            response
+        );
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(int id, Product product)
+    public async Task<ActionResult<ProductResponseDto>> UpdateProduct(
+        int id,
+        ProductUpdateDto dto)
     {
-        if (id != product.Id)
-        {
-            return BadRequest();
-        }
-
         var existingProduct = await _context.Products.FindAsync(id);
 
         if (existingProduct == null)
         {
             return NotFound();
         }
-        
-        existingProduct.SKU = product.SKU;
-        existingProduct.Name = product.Name;
-        existingProduct.Description = product.Description;
-        existingProduct.UnitPrice = product.UnitPrice;
-        existingProduct.ReorderLevel = product.ReorderLevel;
+
+        existingProduct.SKU = dto.SKU;
+        existingProduct.Name = dto.Name;
+        existingProduct.Description = dto.Description;
+        existingProduct.UnitPrice = dto.UnitPrice;
+        existingProduct.ReorderLevel = dto.ReorderLevel;
+        existingProduct.IsActive = dto.IsActive;
 
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        var response = new ProductResponseDto
+        {
+            Id = existingProduct.Id,
+            SKU = existingProduct.SKU,
+            Name = existingProduct.Name,
+            Description = existingProduct.Description,
+            UnitPrice = existingProduct.UnitPrice,
+            ReorderLevel = existingProduct.ReorderLevel,
+            IsActive = existingProduct.IsActive,
+            CreatedAt = existingProduct.CreatedAt
+        };
+
+        return Ok(response);
     }
 
     [HttpDelete("{id}")]
@@ -81,7 +144,8 @@ public class ProductsController : ControllerBase
             return NotFound();
         }
 
-        _context.Products.Remove(product);
+        product.IsActive = false;
+
         await _context.SaveChangesAsync();
 
         return NoContent();
