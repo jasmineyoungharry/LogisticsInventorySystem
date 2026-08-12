@@ -76,4 +76,20 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{id}/reactivate")]
+    public async Task<IActionResult> Reactivate(int id)
+    {
+        var success = await _productService.ReactivateAsync(id);
+
+        if (!success)
+        {
+            return NotFound();
+        }
+
+        return Ok(new
+        {
+            message = "Product reactivated successfully."
+        });
+    }
 }

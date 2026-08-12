@@ -16,7 +16,6 @@ public class ProductService : IProductService
     public async Task<IEnumerable<ProductResponseDto>> GetAllAsync()
     {
         return await _context.Products
-            .Where(product => product.IsActive)
             .Select(product => new ProductResponseDto
             {
                 Id = product.Id,
@@ -126,6 +125,22 @@ public class ProductService : IProductService
         }
 
         product.IsActive = false;
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> ReactivateAsync(int id)
+    {
+        var product = await _context.Products.FindAsync(id);
+
+        if (product == null)
+        {
+            return false;
+        }
+
+        product.IsActive = true;
 
         await _context.SaveChangesAsync();
 

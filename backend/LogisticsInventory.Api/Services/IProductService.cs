@@ -9,4 +9,5 @@ public interface IProductService
     Task<ProductResponseDto> CreateAsync(ProductCreateDto dto);
     Task<ProductResponseDto?> UpdateAsync(int id, ProductUpdateDto dto);
     Task<bool> DeleteAsync(int id);
+    Task<bool> ReactivateAsync(int id);
 }
