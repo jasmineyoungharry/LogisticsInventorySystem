@@ -1,11 +1,13 @@
 using LogisticsInventory.Api.DTOs;
 using LogisticsInventory.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsInventory.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class WarehousesController : ControllerBase
 {
     private readonly IWarehouseService _warehouseService;
@@ -36,6 +38,7 @@ public class WarehousesController : ControllerBase
         return Ok(warehouse);
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpPost]
     public async Task<ActionResult<WarehouseResponseDto>> CreateWarehouse(
         WarehouseCreateDto dto)
@@ -49,6 +52,7 @@ public class WarehousesController : ControllerBase
         );
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpPut("{id}")]
     public async Task<ActionResult<WarehouseResponseDto>> UpdateWarehouse(
         int id,
@@ -64,6 +68,7 @@ public class WarehousesController : ControllerBase
         return Ok(warehouse);
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteWarehouse(int id)
     {
@@ -75,5 +80,21 @@ public class WarehousesController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpPut("{id}/reactivate")]
+    public async Task<IActionResult> ReactivateWarehouse(int id)
+    {
+        var reactivated = await _warehouseService.ReactivateAsync(id);
+
+        if (!reactivated)
+        {
+            return NotFound();
+        }
+
+        return Ok(new
+        {
+            message = "Warehouse reactivated successfully."
+        });
     }
 }

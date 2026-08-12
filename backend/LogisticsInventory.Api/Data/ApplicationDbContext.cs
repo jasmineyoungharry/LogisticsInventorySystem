@@ -1,11 +1,14 @@
 using LogisticsInventory.Api.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LogisticsInventory.Api.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    public ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
     }
@@ -18,7 +21,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(
+        ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
@@ -34,7 +38,7 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(inventory => inventory.WarehouseId)
             .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<InventoryTransaction>()
+        modelBuilder.Entity<InventoryTransaction>()
             .HasOne(transaction => transaction.Inventory)
             .WithMany()
             .HasForeignKey(transaction => transaction.InventoryId)

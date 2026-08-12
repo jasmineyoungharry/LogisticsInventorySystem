@@ -17,7 +17,6 @@ public class WarehouseService : IWarehouseService
     public async Task<IEnumerable<WarehouseResponseDto>> GetAllAsync()
     {
         return await _context.Warehouses
-            .Where(warehouse => warehouse.IsActive)
             .Select(warehouse => new WarehouseResponseDto
             {
                 Id = warehouse.Id,
@@ -106,7 +105,9 @@ public class WarehouseService : IWarehouseService
         warehouse.City = dto.City;
         warehouse.Province = dto.Province;
         warehouse.PostalCode = dto.PostalCode;
-        warehouse.IsActive = dto.IsActive;
+
+        // Editing a warehouse should NOT deactivate it.
+        warehouse.IsActive = true;
 
         await _context.SaveChangesAsync();
 
@@ -134,6 +135,22 @@ public class WarehouseService : IWarehouseService
         }
 
         warehouse.IsActive = false;
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> ReactivateAsync(int id)
+    {
+        var warehouse = await _context.Warehouses.FindAsync(id);
+
+        if (warehouse == null)
+        {
+            return false;
+        }
+
+        warehouse.IsActive = true;
 
         await _context.SaveChangesAsync();
 

@@ -1,11 +1,13 @@
 using LogisticsInventory.Api.DTOs;
 using LogisticsInventory.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsInventory.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class InventoryTransfersController : ControllerBase
 {
     private readonly IInventoryTransferService _transferService;

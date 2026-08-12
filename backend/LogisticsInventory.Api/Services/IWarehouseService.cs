@@ -8,11 +8,14 @@ public interface IWarehouseService
 
     Task<WarehouseResponseDto?> GetByIdAsync(int id);
 
-    Task<WarehouseResponseDto> CreateAsync(WarehouseCreateDto dto);
+    Task<WarehouseResponseDto> CreateAsync(
+        WarehouseCreateDto dto);
 
     Task<WarehouseResponseDto?> UpdateAsync(
         int id,
         WarehouseUpdateDto dto);
 
     Task<bool> DeleteAsync(int id);
+
+    Task<bool> ReactivateAsync(int id);
 }

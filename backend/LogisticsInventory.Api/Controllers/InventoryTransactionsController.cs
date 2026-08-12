@@ -1,11 +1,13 @@
 using LogisticsInventory.Api.DTOs;
 using LogisticsInventory.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsInventory.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class InventoryTransactionsController : ControllerBase
 {
     private readonly IInventoryTransactionService _transactionService;
@@ -37,6 +39,7 @@ public class InventoryTransactionsController : ControllerBase
         return Ok(transaction);
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpPost]
     public async Task<ActionResult<InventoryTransactionResponseDto>> CreateTransaction(
         InventoryTransactionCreateDto dto)

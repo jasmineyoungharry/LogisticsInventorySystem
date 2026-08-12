@@ -1,11 +1,13 @@
 using LogisticsInventory.Api.DTOs;
 using LogisticsInventory.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsInventory.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ProductsController : ControllerBase
 {
     private readonly IProductService _productService;
@@ -36,6 +38,7 @@ public class ProductsController : ControllerBase
         return Ok(product);
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpPost]
     public async Task<ActionResult<ProductResponseDto>> CreateProduct(
         ProductCreateDto dto)
@@ -49,6 +52,7 @@ public class ProductsController : ControllerBase
         );
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpPut("{id}")]
     public async Task<ActionResult<ProductResponseDto>> UpdateProduct(
         int id,
@@ -64,6 +68,7 @@ public class ProductsController : ControllerBase
         return Ok(product);
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)
     {

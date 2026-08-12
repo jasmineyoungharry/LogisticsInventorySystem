@@ -1,11 +1,13 @@
 using LogisticsInventory.Api.DTOs;
 using LogisticsInventory.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsInventory.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class InventoriesController : ControllerBase
 {
     private readonly IInventoryService _inventoryService;
@@ -71,6 +73,7 @@ public class InventoriesController : ControllerBase
         );
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpPut("{id}")]
     public async Task<ActionResult<InventoryResponseDto>> UpdateInventory(
         int id,
