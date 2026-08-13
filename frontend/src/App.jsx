@@ -1,114 +1,134 @@
 import ProductsPage from "./pages/ProductsPage";
-import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import WarehousesPage from "./pages/WarehousesPage";
+import InventoryPage from "./pages/InventoryPage";
+import TransactionsPage from "./pages/TransactionsPage";
+import TransfersPage from "./pages/TransfersPage";
+import DashboardPage from "./pages/DashboardPage";
+import LoginPage from "./pages/LoginPage";
+
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation
+} from "react-router-dom";
+
 import Sidebar from "./components/Sidebar";
-import api from "./api/api";
 
-function Dashboard() {
-  const [products, setProducts] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
-  const [inventories, setInventories] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadDashboard = async () => {
-      try {
-        const [
-          productsResponse,
-          warehousesResponse,
-          inventoriesResponse
-        ] = await Promise.all([
-          api.get("/products"),
-          api.get("/warehouses"),
-          api.get("/inventories")
-        ]);
+// Protect pages that require authentication
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("token");
 
-        setProducts(productsResponse.data);
-        setWarehouses(warehousesResponse.data);
-        setInventories(inventoriesResponse.data);
-      } catch (error) {
-        console.error("Failed to load dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDashboard();
-  }, []);
-
-  if (loading) {
-    return <h1>Loading dashboard...</h1>;
+  if (!token) {
+    return <Navigate to="/login" replace />;
   }
 
-  const lowStockCount = inventories.filter(
-    (inventory) => inventory.isLowStock
-  ).length;
+  return children;
+}
+
+
+// Controls the layout of the application
+function AppContent() {
+  const location = useLocation();
+
+  // Login page should not show the sidebar
+  if (location.pathname === "/login") {
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    );
+  }
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-
-      <p>Welcome to the Logistics Inventory System.</p>
-
-      <div className="dashboard-cards">
-        <div className="dashboard-card">
-          <h3>Total Products</h3>
-          <p>{products.length}</p>
-        </div>
-
-        <div className="dashboard-card">
-          <h3>Warehouses</h3>
-          <p>{warehouses.length}</p>
-        </div>
-
-        <div className="dashboard-card">
-          <h3>Inventory Records</h3>
-          <p>{inventories.length}</p>
-        </div>
-
-        <div className="dashboard-card">
-          <h3>Low Stock</h3>
-          <p>{lowStockCount}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-function Warehouses() {
-  return <h1>Warehouses</h1>;
-}
-
-function Inventory() {
-  return <h1>Inventory</h1>;
-}
-
-function Transactions() {
-  return <h1>Transactions</h1>;
-}
-
-function Transfers() {
-  return <h1>Transfers</h1>;
-}
-
-function App() {
-  return (
-    <BrowserRouter>
+    <>
       <Sidebar />
 
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/warehouses" element={<Warehouses />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/transfers" element={<Transfers />} />
+
+          {/* Dashboard */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Products */}
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <ProductsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Warehouses */}
+          <Route
+            path="/warehouses"
+            element={
+              <ProtectedRoute>
+                <WarehousesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Inventory */}
+          <Route
+            path="/inventory"
+            element={
+              <ProtectedRoute>
+                <InventoryPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Transactions */}
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <TransactionsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Transfers */}
+          <Route
+            path="/transfers"
+            element={
+              <ProtectedRoute>
+                <TransfersPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Unknown routes */}
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
+
         </Routes>
       </main>
+    </>
+  );
+}
+
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }
+
 
 export default App;

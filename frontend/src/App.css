@@ -148,3 +148,83 @@ tbody tr:hover {
   border-radius: 6px;
   margin-bottom: 20px;
 }
+
+.action-button {
+  border: none;
+  background-color: #e5e7eb;
+  color: #111827;
+  padding: 7px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 6px;
+  font-size: 13px;
+}
+
+.action-button:hover {
+  background-color: #d1d5db;
+}
+
+.danger-button {
+  color: #991b1b;
+  background-color: #fee2e2;
+}
+
+.danger-button:hover {
+  background-color: #fecaca;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: #64748b;
+}
+
+.dashboard-card strong {
+  display: block;
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.dashboard-card p {
+  margin: 0;
+  color: #64748b;
+}
+
+.dashboard-section {
+  margin-top: 35px;
+}
+
+.dashboard-section h2 {
+  margin-bottom: 15px;
+}
+
+.status-low {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

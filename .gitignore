@@ -20,3 +20,6 @@ Thumbs.db
 # Environment / secrets
 .env
 .env.*
+
+# ASP.NET configuration with secrets
+appsettings.Development.json
