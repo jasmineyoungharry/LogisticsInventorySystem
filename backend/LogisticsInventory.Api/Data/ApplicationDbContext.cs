@@ -21,6 +21,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
 
+    public DbSet<Supplier> Suppliers { get; set; }      
+
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
     {

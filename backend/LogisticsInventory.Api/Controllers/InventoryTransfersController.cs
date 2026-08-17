@@ -18,6 +18,14 @@ public class InventoryTransfersController : ControllerBase
         _transferService = transferService;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetTransfers()
+    {
+        var transfers = await _transferService.GetTransfersAsync();
+
+        return Ok(transfers);
+    }
+
     [HttpPost]
     public async Task<IActionResult> TransferInventory(
         InventoryTransferDto dto)
@@ -27,7 +35,8 @@ public class InventoryTransfersController : ControllerBase
         if (!success)
         {
             return BadRequest(
-                "The transfer could not be completed. Check the product, warehouses, available stock, and ensure the warehouses are different.");
+                "The transfer could not be completed. Check the product, warehouses, available stock, and ensure the warehouses are different."
+            );
         }
 
         return Ok(new

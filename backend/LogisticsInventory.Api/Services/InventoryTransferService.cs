@@ -79,4 +79,37 @@ public class InventoryTransferService : IInventoryTransferService
 
         return true;
     }
+
+    public async Task<List<object>> GetTransfersAsync()
+    {
+        var transfers = await _context.InventoryTransactions
+            .Where(transaction =>
+                transaction.TransactionType == "TRANSFER_OUT")
+            .Include(transaction => transaction.Inventory)
+                .ThenInclude(inventory => inventory.Product)
+            .Include(transaction => transaction.Inventory)
+                .ThenInclude(inventory => inventory.Warehouse)
+            .OrderByDescending(transaction => transaction.CreatedAt)
+            .Select(transaction => new
+            {
+                id = transaction.Id,
+
+                createdAt = transaction.CreatedAt,
+
+                productName = transaction.Inventory.Product.Name,
+
+                fromWarehouseName =
+                    transaction.Inventory.Warehouse.Name,
+
+                quantity = Math.Abs(transaction.QuantityChange),
+
+                referenceNumber = transaction.ReferenceNumber,
+
+                notes = transaction.Notes
+            })
+            .Cast<object>()
+            .ToListAsync();
+
+        return transfers;
+    }
 }

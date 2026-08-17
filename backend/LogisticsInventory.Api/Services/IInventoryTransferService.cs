@@ -5,4 +5,6 @@ namespace LogisticsInventory.Api.Services;
 public interface IInventoryTransferService
 {
     Task<bool> TransferAsync(InventoryTransferDto dto);
+
+    Task<List<object>> GetTransfersAsync();
 }

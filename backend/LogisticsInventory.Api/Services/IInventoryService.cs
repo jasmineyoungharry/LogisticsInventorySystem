@@ -12,7 +12,14 @@ public interface IInventoryService
         int productId,
         int warehouseId);
 
-    Task<InventoryResponseDto?> CreateAsync(InventoryCreateDto dto);
+    Task<InventoryResponseDto?> CreateAsync(
+        InventoryCreateDto dto);
+
+    Task<InventoryResponseDto?> ReceiveAsync(
+        InventoryReceiveDto dto);
+
+    Task<(InventoryResponseDto? Inventory, string? Error)> ShipAsync(
+        InventoryShipDto dto);
 
     Task<InventoryResponseDto?> UpdateAsync(
         int id,
