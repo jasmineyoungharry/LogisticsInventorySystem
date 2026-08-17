@@ -1,0 +1,426 @@
+.transfers-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.transfers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.transfers-header h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.transfers-header p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* =========================
+   SUMMARY
+========================= */
+
+.transfers-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.transfers-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  padding: 22px;
+  min-height: 120px;
+
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.transfers-stat-card span {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.transfers-stat-card strong {
+  color: #0f172a;
+  font-size: 30px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.transfers-stat-card small {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* =========================
+   MESSAGES
+========================= */
+
+.transfers-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.transfers-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.transfers-readonly-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  padding: 15px 18px;
+  margin-bottom: 24px;
+
+  color: #64748b;
+  font-size: 14px;
+}
+
+.transfers-readonly-notice strong {
+  color: #334155;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.transfers-form-card {
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  padding: 24px;
+  margin-bottom: 28px;
+
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+
+.transfers-form-header {
+  margin-bottom: 24px;
+}
+
+.transfers-form-header h2 {
+  margin: 0;
+
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.transfers-form-header p {
+  margin: 5px 0 0;
+
+  color: #64748b;
+  font-size: 14px;
+}
+
+.transfers-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+
+  margin-bottom: 24px;
+}
+
+.transfers-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.transfers-form-group label {
+  color: #334155;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.transfers-form-group input,
+.transfers-form-group select {
+  width: 100%;
+  box-sizing: border-box;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  padding: 11px 12px;
+
+  background: #ffffff;
+  color: #0f172a;
+
+  font-size: 14px;
+  outline: none;
+}
+
+.transfers-form-group input:focus,
+.transfers-form-group select:focus {
+  border-color: #64748b;
+
+  box-shadow:
+    0 0 0 3px rgba(100, 116, 139, 0.12);
+}
+
+.transfers-form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.transfers-primary-button {
+  border: none;
+  border-radius: 8px;
+
+  padding: 12px 18px;
+
+  background: #0f172a;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.transfers-primary-button:hover {
+  background: #1e293b;
+}
+
+.transfers-secondary-button {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  padding: 12px 18px;
+
+  background: #ffffff;
+  color: #334155;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.transfers-secondary-button:hover {
+  background: #f8fafc;
+}
+
+/* =========================
+   TRANSFER HISTORY
+========================= */
+
+.transfers-table-card {
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+
+.transfers-table-header {
+  padding: 20px 22px;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.transfers-table-header h2 {
+  margin: 0;
+
+  color: #0f172a;
+  font-size: 19px;
+}
+
+.transfers-table-header p {
+  margin: 5px 0 0;
+
+  color: #64748b;
+  font-size: 13px;
+}
+
+.transfers-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.transfers-table {
+  width: 100%;
+  min-width: 850px;
+
+  border-collapse: collapse;
+}
+
+.transfers-table th {
+  padding: 14px 18px;
+
+  background: #f8fafc;
+
+  border-bottom: 1px solid #e2e8f0;
+
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-align: left;
+
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.transfers-table td {
+  padding: 16px 18px;
+
+  border-bottom: 1px solid #f1f5f9;
+
+  color: #334155;
+  font-size: 14px;
+
+  vertical-align: middle;
+}
+
+.transfers-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.transfers-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =========================
+   TABLE DATA
+========================= */
+
+.transfers-date {
+  color: #64748b;
+
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.transfers-product {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.transfers-warehouse {
+  color: #475569;
+}
+
+.transfers-quantity {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.transfers-reference {
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* =========================
+   EMPTY / LOADING
+========================= */
+
+.transfers-empty {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.transfers-empty h3 {
+  margin: 0 0 8px;
+
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.transfers-empty p {
+  margin: 0;
+
+  color: #64748b;
+}
+
+.transfers-loading {
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  padding: 60px;
+
+  text-align: center;
+
+  color: #64748b;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+  .transfers-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .transfers-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .transfers-header {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .transfers-form-actions {
+    flex-direction: column;
+  }
+
+  .transfers-primary-button,
+  .transfers-secondary-button {
+    width: 100%;
+  }
+
+  .transfers-readonly-notice {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}

@@ -53,6 +53,10 @@ function Sidebar() {
           Warehouses
         </NavLink>
 
+        <NavLink to="/suppliers">
+          Suppliers
+        </NavLink>
+
         <NavLink to="/inventory">
           Inventory
         </NavLink>
