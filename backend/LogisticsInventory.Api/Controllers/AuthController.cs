@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Text;
 
@@ -93,6 +94,42 @@ public class AuthController : ControllerBase
         return Ok(new
         {
             token
+        });
+    }
+
+    [Authorize(Roles = "Manager")]
+    [HttpPost("reset-employee-password")]
+    public async Task<IActionResult> ResetEmployeePassword()
+    {
+        var user = await _userManager.FindByEmailAsync(
+            "employee@logistics.com");
+
+        if (user == null)
+        {
+            return NotFound("Employee account was not found.");
+        }
+
+        var removePasswordResult =
+            await _userManager.RemovePasswordAsync(user);
+
+        if (!removePasswordResult.Succeeded)
+        {
+            return BadRequest(removePasswordResult.Errors);
+        }
+
+        var addPasswordResult =
+            await _userManager.AddPasswordAsync(
+                user,
+                "Employee123!");
+
+        if (!addPasswordResult.Succeeded)
+        {
+            return BadRequest(addPasswordResult.Errors);
+        }
+
+        return Ok(new
+        {
+            message = "Employee password reset successfully."
         });
     }
 

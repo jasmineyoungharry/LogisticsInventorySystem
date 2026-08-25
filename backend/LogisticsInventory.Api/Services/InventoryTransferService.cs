@@ -16,11 +16,19 @@ public class InventoryTransferService : IInventoryTransferService
 
     public async Task<bool> TransferAsync(InventoryTransferDto dto)
     {
+        // Quantity must be greater than zero
+        if (dto.Quantity <= 0)
+        {
+            return false;
+        }
+
+        // Source and destination warehouses must be different
         if (dto.FromWarehouseId == dto.ToWarehouseId)
         {
             return false;
         }
 
+        // Find inventory in the source warehouse
         var fromInventory = await _context.Inventories
             .FirstOrDefaultAsync(inventory =>
                 inventory.ProductId == dto.ProductId &&
@@ -31,6 +39,7 @@ public class InventoryTransferService : IInventoryTransferService
             return false;
         }
 
+        // Find inventory in the destination warehouse
         var toInventory = await _context.Inventories
             .FirstOrDefaultAsync(inventory =>
                 inventory.ProductId == dto.ProductId &&
@@ -41,17 +50,23 @@ public class InventoryTransferService : IInventoryTransferService
             return false;
         }
 
+        // Prevent negative inventory
         if (fromInventory.Quantity < dto.Quantity)
         {
             return false;
         }
 
+        var now = DateTime.UtcNow;
+
+        // Remove stock from source warehouse
         fromInventory.Quantity -= dto.Quantity;
+        fromInventory.LastUpdated = now;
+
+        // Add stock to destination warehouse
         toInventory.Quantity += dto.Quantity;
+        toInventory.LastUpdated = now;
 
-        fromInventory.LastUpdated = DateTime.UtcNow;
-        toInventory.LastUpdated = DateTime.UtcNow;
-
+        // Create outgoing transaction
         var transferOut = new InventoryTransaction
         {
             InventoryId = fromInventory.Id,
@@ -59,9 +74,10 @@ public class InventoryTransferService : IInventoryTransferService
             QuantityChange = -dto.Quantity,
             ReferenceNumber = dto.ReferenceNumber,
             Notes = dto.Notes,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = now
         };
 
+        // Create incoming transaction
         var transferIn = new InventoryTransaction
         {
             InventoryId = toInventory.Id,
@@ -69,7 +85,7 @@ public class InventoryTransferService : IInventoryTransferService
             QuantityChange = dto.Quantity,
             ReferenceNumber = dto.ReferenceNumber,
             Notes = dto.Notes,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = now
         };
 
         _context.InventoryTransactions.Add(transferOut);
@@ -96,16 +112,20 @@ public class InventoryTransferService : IInventoryTransferService
 
                 createdAt = transaction.CreatedAt,
 
-                productName = transaction.Inventory.Product.Name,
+                productName =
+                    transaction.Inventory.Product.Name,
 
                 fromWarehouseName =
                     transaction.Inventory.Warehouse.Name,
 
-                quantity = Math.Abs(transaction.QuantityChange),
+                quantity =
+                    Math.Abs(transaction.QuantityChange),
 
-                referenceNumber = transaction.ReferenceNumber,
+                referenceNumber =
+                    transaction.ReferenceNumber,
 
-                notes = transaction.Notes
+                notes =
+                    transaction.Notes
             })
             .Cast<object>()
             .ToListAsync();
