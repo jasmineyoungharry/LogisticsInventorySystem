@@ -57,6 +57,10 @@ function Sidebar() {
           Suppliers
         </NavLink>
 
+        <NavLink to="/purchase-orders">
+          Purchase Orders
+        </NavLink>
+
         <NavLink to="/inventory">
           Inventory
         </NavLink>

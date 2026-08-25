@@ -1,6 +1,7 @@
 import ProductsPage from "./pages/ProductsPage";
 import WarehousesPage from "./pages/WarehousesPage";
 import SuppliersPage from "./pages/SuppliersPage";
+import PurchaseOrdersPage from "./pages/PurchaseOrdersPage";
 import InventoryPage from "./pages/InventoryPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import TransfersPage from "./pages/TransfersPage";
@@ -88,6 +89,14 @@ function AppContent() {
                 <SuppliersPage />
               </ProtectedRoute>
             }
+          />
+
+          <Route
+            path="/purchase-orders"
+            element={
+              <ProtectedRoute>
+                <PurchaseOrdersPage />
+              </ProtectedRoute>}
           />
 
           {/* Inventory */}
