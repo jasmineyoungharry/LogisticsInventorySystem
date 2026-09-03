@@ -1,0 +1,817 @@
+/* =========================================
+   PURCHASE ORDERS PAGE
+========================================= */
+
+.purchase-orders-page {
+  width: 100%;
+  min-height: 100vh;
+
+  padding: 40px;
+
+  box-sizing: border-box;
+
+  background: #f4f6f8;
+
+  overflow-x: hidden;
+}
+
+
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.purchase-orders-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 25px;
+
+  margin-bottom: 40px;
+}
+
+.purchase-orders-header h1 {
+  margin: 0;
+
+  font-size: 36px;
+
+  color: #172b4d;
+}
+
+.purchase-orders-header p {
+  margin: 8px 0 0;
+
+  font-size: 18px;
+
+  color: #64748b;
+}
+
+
+/* =========================================
+   NEW PURCHASE ORDER BUTTON
+========================================= */
+
+.new-purchase-order-button {
+  padding: 13px 22px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #2563eb;
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.new-purchase-order-button:hover {
+  background: #1d4ed8;
+}
+
+
+/* =========================================
+   SUCCESS MESSAGE
+========================================= */
+
+.success-message {
+  margin-bottom: 25px;
+
+  padding: 14px 18px;
+
+  border-radius: 6px;
+
+  background: #dcfce7;
+
+  color: #166534;
+
+  font-size: 16px;
+}
+
+
+/* =========================================
+   ERROR MESSAGE
+========================================= */
+
+.error-message {
+  margin-bottom: 25px;
+
+  padding: 14px 18px;
+
+  border-radius: 6px;
+
+  background: #fee2e2;
+
+  color: #b91c1c;
+
+  font-size: 16px;
+}
+
+
+/* =========================================
+   PURCHASE ORDER SECTION
+========================================= */
+
+.purchase-orders-section {
+  width: 100%;
+
+  min-width: 0;
+}
+
+.purchase-orders-section h2 {
+  margin: 0 0 25px;
+
+  font-size: 28px;
+
+  color: #172b4d;
+}
+
+
+/* =========================================
+   TABLE CONTAINER
+========================================= */
+
+/*
+   THIS IS THE IMPORTANT PART.
+
+   The container gets its own horizontal
+   scrollbar when the table is wider than
+   the available screen.
+*/
+
+.purchase-orders-table-container {
+  display: block;
+
+  width: 100%;
+
+  max-width: 100%;
+
+  /*
+     Horizontal scrolling
+  */
+  overflow-x: auto;
+
+  /*
+     Vertical scrolling
+  */
+  overflow-y: auto;
+
+  /*
+     Gives the container a maximum height
+     so the vertical scrollbar can appear
+     when necessary.
+  */
+  max-height: 65vh;
+
+  background: white;
+
+  border-radius: 10px;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+
+  /*
+     Makes scrolling smoother
+     on touch devices.
+  */
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* =========================================
+   TABLE SCROLLBAR
+========================================= */
+
+/*
+   Both horizontal and vertical scrollbar
+   sizes.
+*/
+
+.purchase-orders-table-container::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+
+/*
+   Scrollbar track
+*/
+
+.purchase-orders-table-container::-webkit-scrollbar-track {
+  background: #e5e7eb;
+}
+
+
+/*
+   Scrollbar thumb
+*/
+
+.purchase-orders-table-container::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+
+  border-radius: 10px;
+
+  border: 2px solid #e5e7eb;
+}
+
+
+/*
+   Hover effect
+*/
+
+.purchase-orders-table-container::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+
+/*
+   Bottom-right corner where the
+   horizontal and vertical scrollbars meet.
+*/
+
+.purchase-orders-table-container::-webkit-scrollbar-corner {
+  background: #e5e7eb;
+}
+
+
+/* =========================================
+   PURCHASE ORDER TABLE
+========================================= */
+
+/*
+   IMPORTANT:
+
+   width: max-content forces the table
+   to keep its natural width.
+
+   min-width makes sure it doesn't become
+   too small.
+
+   This creates the LEFT <----> RIGHT
+   scrollbar when the screen is narrow.
+*/
+
+.purchase-orders-table {
+  width: max-content;
+
+  min-width: 1100px;
+
+  border-collapse: collapse;
+
+  background: white;
+}
+
+
+/* =========================================
+   TABLE HEADER
+========================================= */
+
+.purchase-orders-table th {
+  padding: 16px 18px;
+
+  text-align: left;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  color: #64748b;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   TABLE CELLS
+========================================= */
+
+.purchase-orders-table td {
+  padding: 16px 18px;
+
+  font-size: 16px;
+
+  color: #172b4d;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   LAST ROW
+========================================= */
+
+.purchase-orders-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================
+   ROW HOVER
+========================================= */
+
+.purchase-orders-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+
+/* =========================================
+   PURCHASE ORDER NUMBER
+========================================= */
+
+.purchase-order-number {
+  font-weight: 700;
+
+  color: #172b4d;
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+.purchase-order-status {
+  font-weight: 600;
+}
+
+.purchase-order-status.pending {
+  color: #172b4d;
+}
+
+.purchase-order-status.received {
+  color: #008a3e;
+}
+
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+.action-buttons {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   SMALL ACTION BUTTON
+========================================= */
+
+.small-action-button {
+  padding: 7px 12px;
+
+  min-width: 64px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
+}
+
+.small-action-button:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================================
+   VIEW BUTTON
+========================================= */
+
+.small-action-button.view-button {
+  background: #e5e7eb;
+
+  color: #111827;
+}
+
+.small-action-button.view-button:hover {
+  background: #d1d5db;
+}
+
+
+/* =========================================
+   RECEIVE BUTTON
+========================================= */
+
+.small-action-button.receive-button {
+  background: #2563eb;
+
+  color: white;
+}
+
+.small-action-button.receive-button:hover {
+  background: #1d4ed8;
+}
+
+
+/* =========================================
+   DISABLED BUTTON
+========================================= */
+
+.small-action-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.no-purchase-orders {
+  padding: 40px;
+
+  text-align: center;
+
+  color: #64748b;
+
+  font-size: 17px;
+}
+
+
+/* =========================================
+   PURCHASE ORDER FORM
+========================================= */
+
+.purchase-order-form-container {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-bottom: 35px;
+
+  padding: 30px;
+
+  background: white;
+
+  border-radius: 10px;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.purchase-order-form-container h2 {
+  margin-top: 0;
+
+  margin-bottom: 25px;
+
+  color: #172b4d;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.purchase-order-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+
+/* =========================================
+   FORM GROUP
+========================================= */
+
+.form-group {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 16px;
+
+  font-weight: 600;
+
+  color: #172b4d;
+}
+
+
+/* =========================================
+   FORM INPUTS
+========================================= */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 6px;
+
+  font-size: 16px;
+
+  color: #172b4d;
+
+  background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+
+  border-color: #2563eb;
+}
+
+.form-group textarea {
+  min-height: 100px;
+
+  resize: vertical;
+}
+
+
+/* =========================================
+   FORM BUTTONS
+========================================= */
+
+.form-buttons {
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 10px;
+}
+
+
+.primary-button {
+  padding: 11px 20px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #2563eb;
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #1d4ed8;
+}
+
+
+.secondary-button {
+  padding: 11px 20px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #e5e7eb;
+
+  color: #111827;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  background: #d1d5db;
+}
+
+
+/* =========================================
+   PURCHASE ORDER ITEMS
+========================================= */
+
+.purchase-order-items {
+  margin-top: 25px;
+}
+
+.purchase-order-items h3 {
+  margin-bottom: 15px;
+
+  color: #172b4d;
+}
+
+
+.purchase-order-item {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr
+    1fr
+    auto;
+
+  gap: 12px;
+
+  align-items: end;
+
+  margin-bottom: 12px;
+}
+
+
+/* =========================================
+   REMOVE ITEM BUTTON
+========================================= */
+
+.remove-item-button {
+  padding: 11px 14px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #ef4444;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.remove-item-button:hover {
+  background: #dc2626;
+}
+
+
+/* =========================================
+   ADD ITEM BUTTON
+========================================= */
+
+.add-item-button {
+  padding: 10px 16px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #e5e7eb;
+
+  color: #111827;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.add-item-button:hover {
+  background: #d1d5db;
+}
+
+
+/* =========================================
+   RESPONSIVE - TABLET
+========================================= */
+
+@media (max-width: 1000px) {
+
+  .purchase-orders-page {
+    padding: 30px;
+  }
+
+  .purchase-orders-header {
+    gap: 20px;
+  }
+
+  .purchase-orders-header h1 {
+    font-size: 32px;
+  }
+
+  .purchase-orders-header p {
+    font-size: 17px;
+  }
+}
+
+
+/* =========================================
+   RESPONSIVE - SMALL SCREEN
+========================================= */
+
+@media (max-width: 700px) {
+
+  .purchase-orders-page {
+    padding: 20px;
+  }
+
+
+  .purchase-orders-header {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    margin-bottom: 30px;
+  }
+
+
+  .purchase-orders-header h1 {
+    font-size: 28px;
+  }
+
+
+  .purchase-orders-header p {
+    font-size: 16px;
+  }
+
+
+  .new-purchase-order-button {
+    width: fit-content;
+  }
+
+
+  .purchase-orders-section h2 {
+    font-size: 24px;
+  }
+
+
+  /*
+     Keep the table wide enough to require
+     horizontal scrolling.
+  */
+
+  .purchase-orders-table {
+    width: max-content;
+
+    min-width: 1100px;
+  }
+
+
+  .purchase-orders-table th,
+  .purchase-orders-table td {
+    padding: 12px 14px;
+
+    font-size: 14px;
+  }
+
+
+  .small-action-button {
+    padding: 6px 10px;
+
+    min-width: 58px;
+
+    font-size: 13px;
+  }
+}
+
+
+/* =========================================
+   VERY SMALL SCREEN
+========================================= */
+
+@media (max-width: 450px) {
+
+  .purchase-orders-page {
+    padding: 15px;
+  }
+
+
+  .purchase-orders-header h1 {
+    font-size: 25px;
+  }
+
+
+  .purchase-order-form-container {
+    padding: 20px;
+  }
+}

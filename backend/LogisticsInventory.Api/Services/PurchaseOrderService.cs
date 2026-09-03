@@ -32,6 +32,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         return purchaseOrders.Select(MapToResponse);
     }
 
+
     // GET PURCHASE ORDER BY ID
 
     public async Task<PurchaseOrderResponseDto?>
@@ -53,14 +54,14 @@ public class PurchaseOrderService : IPurchaseOrderService
         return MapToResponse(purchaseOrder);
     }
 
+
     // CREATE PURCHASE ORDER
 
     public async Task<PurchaseOrderResponseDto?>
         CreateAsync(PurchaseOrderCreateDto dto)
     {
-       
         // Validate supplier
-       
+
         var supplierExists = await _context.Suppliers
             .AnyAsync(supplier =>
                 supplier.Id == dto.SupplierId);
@@ -69,6 +70,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         {
             return null;
         }
+
 
         // Validate warehouse
 
@@ -81,25 +83,29 @@ public class PurchaseOrderService : IPurchaseOrderService
             return null;
         }
 
+
         // Validate purchase order number
 
         var purchaseOrderExists =
             await _context.PurchaseOrders
                 .AnyAsync(purchaseOrder =>
                     purchaseOrder.PurchaseOrderNumber ==
-                    dto.PurchaseOrderNumber);
+                    dto.PurchaseOrderNumber.Trim());
 
         if (purchaseOrderExists)
         {
             return null;
         }
 
+
         // Make sure the order contains products
 
-        if (dto.Items == null || dto.Items.Count == 0)
+        if (dto.Items == null ||
+            dto.Items.Count == 0)
         {
             return null;
         }
+
 
         // Make sure quantities and costs are valid
 
@@ -115,6 +121,7 @@ public class PurchaseOrderService : IPurchaseOrderService
                 return null;
             }
         }
+
 
         // Validate all products
 
@@ -134,6 +141,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         {
             return null;
         }
+
 
         // Create purchase order
 
@@ -157,7 +165,9 @@ public class PurchaseOrderService : IPurchaseOrderService
             CreatedAt = DateTime.UtcNow
         };
 
+
         // Add purchase order items
+
         foreach (var itemDto in dto.Items)
         {
             var item = new PurchaseOrderItem
@@ -172,7 +182,8 @@ public class PurchaseOrderService : IPurchaseOrderService
             purchaseOrder.Items.Add(item);
         }
 
-        // Save
+
+        // Save purchase order
 
         _context.PurchaseOrders.Add(purchaseOrder);
 
@@ -182,6 +193,136 @@ public class PurchaseOrderService : IPurchaseOrderService
         // Return created purchase order
 
         return await GetByIdAsync(purchaseOrder.Id);
+    }
+
+
+    // RECEIVE PURCHASE ORDER
+
+    public async Task<PurchaseOrderResponseDto?>
+        ReceiveAsync(int id)
+    {
+        var purchaseOrder = await _context.PurchaseOrders
+            .Include(purchaseOrder => purchaseOrder.Items)
+                .ThenInclude(item => item.Product)
+            .FirstOrDefaultAsync(
+                purchaseOrder => purchaseOrder.Id == id);
+
+
+        // Purchase order does not exist
+
+        if (purchaseOrder == null)
+        {
+            return null;
+        }
+
+
+        // Prevent receiving the same purchase order twice
+
+        if (purchaseOrder.Status == "RECEIVED")
+        {
+            return null;
+        }
+
+
+        // Make sure the purchase order has items
+
+        if (purchaseOrder.Items == null ||
+            purchaseOrder.Items.Count == 0)
+        {
+            return null;
+        }
+
+
+        // Process each purchase order item
+
+        foreach (var item in purchaseOrder.Items)
+        {
+            // Find inventory for this product
+            // at the purchase order warehouse
+
+            var inventory = await _context.Inventories
+                .FirstOrDefaultAsync(inventory =>
+                    inventory.ProductId == item.ProductId &&
+                    inventory.WarehouseId ==
+                        purchaseOrder.WarehouseId);
+
+
+            // If inventory does not exist,
+            // create a new inventory record
+
+            if (inventory == null)
+            {
+                inventory = new Inventory
+                {
+                    ProductId = item.ProductId,
+
+                    WarehouseId =
+                        purchaseOrder.WarehouseId,
+
+                    Quantity = item.Quantity,
+
+                    LastUpdated = DateTime.UtcNow
+                };
+
+                _context.Inventories.Add(inventory);
+
+                // Save so the new inventory
+                // receives its database ID
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Add received quantity
+                // to existing inventory
+
+                inventory.Quantity += item.Quantity;
+
+                inventory.LastUpdated =
+                    DateTime.UtcNow;
+            }
+
+
+            // Create inventory transaction
+
+            var transaction = new InventoryTransaction
+            {
+                InventoryId = inventory.Id,
+
+                TransactionType = "RECEIPT",
+
+                QuantityChange = item.Quantity,
+
+                ReferenceNumber =
+                    purchaseOrder.PurchaseOrderNumber,
+
+                Notes =
+                    $"Received purchase order " +
+                    $"{purchaseOrder.PurchaseOrderNumber}",
+
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.InventoryTransactions.Add(transaction);
+        }
+
+
+        // Mark purchase order as received
+
+        purchaseOrder.Status = "RECEIVED";
+
+        purchaseOrder.ReceivedAt =
+            DateTime.UtcNow;
+
+
+        // Save all changes
+
+        await _context.SaveChangesAsync();
+
+
+        // Return updated purchase order
+
+        return await GetByIdAsync(id);
     }
 
 
@@ -209,6 +350,7 @@ public class PurchaseOrderService : IPurchaseOrderService
             })
             .ToList();
 
+
         return new PurchaseOrderResponseDto
         {
             Id = purchaseOrder.Id,
@@ -216,12 +358,14 @@ public class PurchaseOrderService : IPurchaseOrderService
             SupplierId = purchaseOrder.SupplierId,
 
             SupplierName =
-                purchaseOrder.Supplier?.Name ?? string.Empty,
+                purchaseOrder.Supplier?.Name ??
+                string.Empty,
 
             WarehouseId = purchaseOrder.WarehouseId,
 
             WarehouseName =
-                purchaseOrder.Warehouse?.Name ?? string.Empty,
+                purchaseOrder.Warehouse?.Name ??
+                string.Empty,
 
             PurchaseOrderNumber =
                 purchaseOrder.PurchaseOrderNumber,

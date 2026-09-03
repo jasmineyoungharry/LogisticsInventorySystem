@@ -75,4 +75,30 @@ public class PurchaseOrdersController : ControllerBase
             new { id = purchaseOrder.Id },
             purchaseOrder);
     }
+
+    // POST: api/PurchaseOrders/5/receive
+    [HttpPost("{id}/receive")]
+    public async Task<IActionResult> Receive(int id)
+    {
+        var purchaseOrder =
+            await _purchaseOrderService.ReceiveAsync(id);
+
+        if (purchaseOrder == null)
+        {
+            return BadRequest(new
+            {
+                message =
+                    "Unable to receive purchase order. " +
+                    "Make sure the purchase order exists, " +
+                    "has not already been received, " +
+                    "contains items, and inventory records exist."
+            });
+        }
+
+        return Ok(new
+        {
+            message = "Purchase order received successfully.",
+            purchaseOrder
+        });
+    }
 }

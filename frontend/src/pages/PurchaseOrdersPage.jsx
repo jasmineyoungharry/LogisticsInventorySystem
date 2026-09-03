@@ -12,6 +12,8 @@ function PurchaseOrdersPage() {
   const [success, setSuccess] = useState("");
 
   const [showForm, setShowForm] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [receivingId, setReceivingId] = useState(null);
 
   const [formData, setFormData] = useState({
     supplierId: "",
@@ -28,6 +30,8 @@ function PurchaseOrdersPage() {
       unitCost: "",
     },
   ]);
+
+  // LOAD DATA
 
   const loadData = async () => {
     try {
@@ -61,6 +65,8 @@ function PurchaseOrdersPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // FORM HANDLING
 
   const handleFormChange = (event) => {
     setFormData({
@@ -96,7 +102,11 @@ function PurchaseOrdersPage() {
       return;
     }
 
-    setItems(items.filter((_, itemIndex) => itemIndex !== index));
+    setItems(
+      items.filter(
+        (_, itemIndex) => itemIndex !== index
+      )
+    );
   };
 
   const resetForm = () => {
@@ -116,6 +126,8 @@ function PurchaseOrdersPage() {
       },
     ]);
   };
+
+  // CREATE PURCHASE ORDER
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -148,17 +160,29 @@ function PurchaseOrdersPage() {
         return;
       }
 
+      if (!formData.purchaseOrderNumber.trim()) {
+        setError(
+          "Please enter a purchase order number."
+        );
+        return;
+      }
+
       const purchaseOrderData = {
         supplierId: Number(formData.supplierId),
+
         warehouseId: Number(formData.warehouseId),
+
         purchaseOrderNumber:
           formData.purchaseOrderNumber.trim(),
+
         expectedDate: formData.expectedDate
           ? new Date(
               `${formData.expectedDate}T00:00:00`
             ).toISOString()
           : null,
+
         notes: formData.notes.trim(),
+
         items: items.map((item) => ({
           productId: Number(item.productId),
           quantity: Number(item.quantity),
@@ -189,14 +213,21 @@ function PurchaseOrdersPage() {
     }
   };
 
+  // CALCULATE FORM TOTAL
+
   const calculateFormTotal = () => {
     return items.reduce((total, item) => {
-      const quantity = Number(item.quantity) || 0;
-      const unitCost = Number(item.unitCost) || 0;
+      const quantity =
+        Number(item.quantity) || 0;
+
+      const unitCost =
+        Number(item.unitCost) || 0;
 
       return total + quantity * unitCost;
     }, 0);
   };
+
+  // STATUS CLASS
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -214,18 +245,105 @@ function PurchaseOrdersPage() {
     }
   };
 
+  // VIEW PURCHASE ORDER
+
+  const handleViewOrder = async (id) => {
+    try {
+      setError("");
+      setSuccess("");
+
+      const response = await api.get(
+        `/purchaseorders/${id}`
+      );
+
+      setSelectedOrder(response.data);
+    } catch (error) {
+      console.error(error);
+
+      setError(
+        "Failed to load purchase order details."
+      );
+    }
+  };
+
+  // RECEIVE PURCHASE ORDER
+
+  const handleReceiveOrder = async (order) => {
+    if (order.status === "RECEIVED") {
+      setError(
+        "This purchase order has already been received."
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to receive purchase order ${order.purchaseOrderNumber}?\n\n` +
+        `This will add the ordered quantities to ${order.warehouseName} and mark the purchase order as RECEIVED.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setError("");
+      setSuccess("");
+
+      setReceivingId(order.id);
+
+      const response = await api.post(
+        `/purchaseorders/${order.id}/receive`
+      );
+
+      setSuccess(
+        response.data?.message ||
+          "Purchase order received successfully."
+      );
+
+      // Refresh purchase order list
+      await loadData();
+
+      // Refresh currently selected order if open
+      if (selectedOrder?.id === order.id) {
+        const updatedOrder = await api.get(
+          `/purchaseorders/${order.id}`
+        );
+
+        setSelectedOrder(updatedOrder.data);
+      }
+    } catch (error) {
+      console.error(error);
+
+      setError(
+        error.response?.data?.message ||
+          "Failed to receive purchase order."
+      );
+    } finally {
+      setReceivingId(null);
+    }
+  };
+
+  // CLOSE DETAILS
+
+  const closeDetails = () => {
+    setSelectedOrder(null);
+  };
+
   if (loading) {
     return <h1>Loading purchase orders...</h1>;
   }
 
   return (
     <div>
+      {/* PAGE HEADER */}
+
       <div className="page-header">
         <div>
           <h1>Purchase Orders</h1>
 
           <p>
-            Create and manage purchase orders from suppliers.
+            Create and manage purchase orders from
+            suppliers.
           </p>
         </div>
 
@@ -237,9 +355,13 @@ function PurchaseOrdersPage() {
             setSuccess("");
           }}
         >
-          {showForm ? "Cancel" : "+ New Purchase Order"}
+          {showForm
+            ? "Cancel"
+            : "+ New Purchase Order"}
         </button>
       </div>
+
+      {/* ERROR */}
 
       {error && (
         <div className="error-message">
@@ -247,11 +369,15 @@ function PurchaseOrdersPage() {
         </div>
       )}
 
+      {/* SUCCESS */}
+
       {success && (
         <div className="success-message">
           {success}
         </div>
       )}
+
+      {/* CREATE PURCHASE ORDER FORM */}
 
       {showForm && (
         <div className="form-card">
@@ -259,6 +385,9 @@ function PurchaseOrdersPage() {
 
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
+
+              {/* SUPPLIER */}
+
               <div className="form-group">
                 <label>Supplier</label>
 
@@ -288,8 +417,12 @@ function PurchaseOrdersPage() {
                 </select>
               </div>
 
+              {/* WAREHOUSE */}
+
               <div className="form-group">
-                <label>Receiving Warehouse</label>
+                <label>
+                  Receiving Warehouse
+                </label>
 
                 <select
                   name="warehouseId"
@@ -317,8 +450,12 @@ function PurchaseOrdersPage() {
                 </select>
               </div>
 
+              {/* PO NUMBER */}
+
               <div className="form-group">
-                <label>Purchase Order Number</label>
+                <label>
+                  Purchase Order Number
+                </label>
 
                 <input
                   type="text"
@@ -332,6 +469,8 @@ function PurchaseOrdersPage() {
                 />
               </div>
 
+              {/* EXPECTED DATE */}
+
               <div className="form-group">
                 <label>Expected Date</label>
 
@@ -344,6 +483,8 @@ function PurchaseOrdersPage() {
               </div>
             </div>
 
+            {/* NOTES */}
+
             <div className="form-group">
               <label>Notes</label>
 
@@ -355,6 +496,8 @@ function PurchaseOrdersPage() {
                 placeholder="Optional notes..."
               />
             </div>
+
+            {/* ITEMS */}
 
             <div className="purchase-order-items">
               <div className="section-header">
@@ -374,6 +517,8 @@ function PurchaseOrdersPage() {
                   className="purchase-order-item"
                   key={index}
                 >
+                  {/* PRODUCT */}
+
                   <div className="form-group">
                     <label>Product</label>
 
@@ -408,6 +553,8 @@ function PurchaseOrdersPage() {
                     </select>
                   </div>
 
+                  {/* QUANTITY */}
+
                   <div className="form-group">
                     <label>Quantity</label>
 
@@ -425,6 +572,8 @@ function PurchaseOrdersPage() {
                       required
                     />
                   </div>
+
+                  {/* UNIT COST */}
 
                   <div className="form-group">
                     <label>Unit Cost</label>
@@ -445,18 +594,24 @@ function PurchaseOrdersPage() {
                     />
                   </div>
 
+                  {/* ITEM TOTAL */}
+
                   <div className="form-group">
                     <label>Total</label>
 
                     <input
                       type="text"
                       value={(
-                        (Number(item.quantity) || 0) *
-                        (Number(item.unitCost) || 0)
+                        (Number(item.quantity) ||
+                          0) *
+                        (Number(item.unitCost) ||
+                          0)
                       ).toFixed(2)}
                       readOnly
                     />
                   </div>
+
+                  {/* REMOVE */}
 
                   <button
                     type="button"
@@ -471,6 +626,8 @@ function PurchaseOrdersPage() {
                 </div>
               ))}
 
+              {/* ORDER TOTAL */}
+
               <div className="purchase-order-total">
                 <strong>
                   Order Total: $
@@ -478,6 +635,8 @@ function PurchaseOrdersPage() {
                 </strong>
               </div>
             </div>
+
+            {/* SUBMIT */}
 
             <button
               type="submit"
@@ -488,6 +647,8 @@ function PurchaseOrdersPage() {
           </form>
         </div>
       )}
+
+      {/* PURCHASE ORDER LIST */}
 
       <div className="dashboard-section">
         <h2>Purchase Order List</h2>
@@ -509,31 +670,43 @@ function PurchaseOrdersPage() {
                   <th>Items</th>
                   <th>Total</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
 
               <tbody>
                 {purchaseOrders.map((order) => (
                   <tr key={order.id}>
+
+                    {/* PO NUMBER */}
+
                     <td>
                       <strong>
                         {order.purchaseOrderNumber}
                       </strong>
                     </td>
 
+                    {/* SUPPLIER */}
+
                     <td>
                       {order.supplierName}
                     </td>
 
+                    {/* WAREHOUSE */}
+
                     <td>
                       {order.warehouseName}
                     </td>
+
+                    {/* ORDER DATE */}
 
                     <td>
                       {new Date(
                         order.orderDate
                       ).toLocaleDateString()}
                     </td>
+
+                    {/* EXPECTED DATE */}
 
                     <td>
                       {order.expectedDate
@@ -543,9 +716,13 @@ function PurchaseOrdersPage() {
                         : "-"}
                     </td>
 
+                    {/* ITEMS */}
+
                     <td>
                       {order.items?.length || 0}
                     </td>
+
+                    {/* TOTAL */}
 
                     <td>
                       $
@@ -553,6 +730,8 @@ function PurchaseOrdersPage() {
                         order.totalAmount || 0
                       ).toFixed(2)}
                     </td>
+
+                    {/* STATUS */}
 
                     <td>
                       <span
@@ -563,6 +742,52 @@ function PurchaseOrdersPage() {
                         {order.status}
                       </span>
                     </td>
+
+                    {/* ACTIONS */}
+
+                    <td>
+                      <div className="action-buttons">
+
+                        {/* VIEW */}
+
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          onClick={() =>
+                            handleViewOrder(
+                              order.id
+                            )
+                          }
+                        >
+                          View
+                        </button>
+
+                        {/* RECEIVE */}
+
+                        {order.status ===
+                          "PENDING" && (
+                          <button
+                            type="button"
+                            className="primary-button"
+                            onClick={() =>
+                              handleReceiveOrder(
+                                order
+                              )
+                            }
+                            disabled={
+                              receivingId ===
+                              order.id
+                            }
+                          >
+                            {receivingId ===
+                            order.id
+                              ? "Receiving..."
+                              : "Receive"}
+                          </button>
+                        )}
+
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -570,6 +795,245 @@ function PurchaseOrdersPage() {
           </div>
         )}
       </div>
+
+      {/* PURCHASE ORDER DETAILS */}
+
+      {selectedOrder && (
+        <div className="form-card">
+          <div className="section-header">
+            <div>
+              <h2>
+                Purchase Order Details
+              </h2>
+
+              <p>
+                {selectedOrder.purchaseOrderNumber}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={closeDetails}
+            >
+              Close
+            </button>
+          </div>
+
+          {/* BASIC INFORMATION */}
+
+          <div className="form-grid">
+
+            <div className="form-group">
+              <label>PO Number</label>
+
+              <input
+                type="text"
+                value={
+                  selectedOrder.purchaseOrderNumber
+                }
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Supplier</label>
+
+              <input
+                type="text"
+                value={
+                  selectedOrder.supplierName
+                }
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Warehouse</label>
+
+              <input
+                type="text"
+                value={
+                  selectedOrder.warehouseName
+                }
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Status</label>
+
+              <input
+                type="text"
+                value={
+                  selectedOrder.status
+                }
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Order Date</label>
+
+              <input
+                type="text"
+                value={
+                  selectedOrder.orderDate
+                    ? new Date(
+                        selectedOrder.orderDate
+                      ).toLocaleDateString()
+                    : "-"
+                }
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Expected Date</label>
+
+              <input
+                type="text"
+                value={
+                  selectedOrder.expectedDate
+                    ? new Date(
+                        selectedOrder.expectedDate
+                      ).toLocaleDateString()
+                    : "-"
+                }
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Received Date</label>
+
+              <input
+                type="text"
+                value={
+                  selectedOrder.receivedAt
+                    ? new Date(
+                        selectedOrder.receivedAt
+                      ).toLocaleString()
+                    : "-"
+                }
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Total Amount</label>
+
+              <input
+                type="text"
+                value={`$${Number(
+                  selectedOrder.totalAmount || 0
+                ).toFixed(2)}`}
+                readOnly
+              />
+            </div>
+          </div>
+
+          {/* NOTES */}
+
+          <div className="form-group">
+            <label>Notes</label>
+
+            <textarea
+              value={
+                selectedOrder.notes || ""
+              }
+              readOnly
+              rows="3"
+            />
+          </div>
+
+          {/* ITEMS */}
+
+          <div className="purchase-order-items">
+            <div className="section-header">
+              <h3>Order Items</h3>
+            </div>
+
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Cost</th>
+                    <th>Total Cost</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {selectedOrder.items?.map(
+                    (item) => (
+                      <tr key={item.id}>
+                        <td>
+                          {item.productName}
+                        </td>
+
+                        <td>
+                          {item.quantity}
+                        </td>
+
+                        <td>
+                          $
+                          {Number(
+                            item.unitCost || 0
+                          ).toFixed(2)}
+                        </td>
+
+                        <td>
+                          $
+                          {Number(
+                            item.totalCost || 0
+                          ).toFixed(2)}
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* DETAILS TOTAL */}
+
+            <div className="purchase-order-total">
+              <strong>
+                Total: $
+                {Number(
+                  selectedOrder.totalAmount || 0
+                ).toFixed(2)}
+              </strong>
+            </div>
+          </div>
+
+          {/* RECEIVE FROM DETAILS */}
+
+          {selectedOrder.status ===
+            "PENDING" && (
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() =>
+                handleReceiveOrder(
+                  selectedOrder
+                )
+              }
+              disabled={
+                receivingId ===
+                selectedOrder.id
+              }
+            >
+              {receivingId ===
+              selectedOrder.id
+                ? "Receiving..."
+                : "Receive Purchase Order"}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
